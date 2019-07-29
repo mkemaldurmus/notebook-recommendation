@@ -2,18 +2,21 @@ package com.exastax.notebook.producer;
 
 import com.exastax.notebook.commons.MongoSingletonClient;
 import com.exastax.notebook.commons.UnsafeOkHtppClient;
+import com.exastax.notebook.model.CityModel;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.util.JSON;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.bson.Document;
-
+import org.json.JSONObject;
 import java.io.IOException;
-import java.net.UnknownHostException;
 
 public class DataProducerMain {
 
@@ -35,17 +38,29 @@ public class DataProducerMain {
 
         Response response = client.newCall(request).execute();
         String body = response.body().string();
+        JSONObject responseObject=new JSONObject(body);
 
+        JSONObject requestObject=new JSONObject(request.body().toString());
+        JSONObject object1=new JSONObject();
+        object1.put("request",request);
+        object1.put("response",responseObject);
 
         DocumentContext bodyParse = JsonPath.parse(body);
         Integer size= bodyParse.read("$.data.1.length()");
+        Gson gson = new GsonBuilder().create();
 
         for (int i=0;i<size;i++){
             Object object = bodyParse.read("$.data.1[" + i + "]");
-            Object read = JsonPath.read(object, "$.id");
-            System.out.println();
+            String cityCode = JsonPath.read(object, "$.id");
+            String cityName = JsonPath.read(object, "$.name");
+            CityModel cityModel=new CityModel();
+            cityModel.setCityCode(cityCode);
+            cityModel.setCityName(cityName);
+            JSONObject jsonObject=new JSONObject(gson.toJson(cityModel));
+
+            Document document = (Document) JSON.parse(jsonObject.toString());
+            cityCollection.insertOne(document);
+
         }
-
     }
-
 }
