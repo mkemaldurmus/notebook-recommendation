@@ -11,7 +11,7 @@ import java.util.concurrent.TimeoutException;
  * @since : 29.07.2019
  **/
 public class RabbitConnect {
-    public static Channel getChannel(String host, Integer port, String username,
+    public Channel getChannel(String host, Integer port, String username,
                                      String password, String virtualHost) throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(host);
