@@ -9,11 +9,23 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>data-crawl</module>
         <module>price-prediction</module>
         <module>rest-api</module>
         <module>data-collector</module>
     </modules>
 
+    <properties>
+        <mongo.driver.version>3.8.1</mongo.driver.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${mongo.driver.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>
